@@ -8,6 +8,7 @@ public class Snake {
     int snakeHeadX, snakeHeadY, foodX, foodY, score;
     int[] snakeX, snakeY;
     Random rand;
+    int numMoves;
 
     public Snake(int boardSize, Random rand) {
         this.boardSize = boardSize;
@@ -37,6 +38,7 @@ public class Snake {
         }
         board[snakeHeadX][snakeHeadY] = 'S';
         board[foodX][foodY] = 'F';
+        numMoves = 0;
     }
 
     public char move(char direction) {
@@ -115,7 +117,88 @@ public class Snake {
             board[snakeX[snakeLength - 1]][snakeY[snakeLength - 1]] = ' ';
         }
 
+        numMoves++;
+        
         return 'C';
+    }
+
+    public double getfeatureValue(int x, int y){
+        //look at cell above and left to snake head, if it is food, set ret[0] to 1, if it is nothing set ret[0] to 0.5, it it is snake set ret[0] to -0.5 and if it is a wall set ret[0] to -1
+        //for a cell given
+        if(x < 0 || x >= boardSize || y < 0 || y >= boardSize){
+            return -1;
+        }
+        if(board[x][y] == 'F'){
+            return 1;
+        }
+        else if(board[x][y] == ' '){
+            return 0.5;
+        }
+        else if(board[x][y] == 'S'){
+            return -0.5;
+        }
+        else{
+            return -1;
+        }
+    }
+
+    public double[] getFeatureInput(){
+        //Return an array of size 10 that represents the feature set of the PSO trained NN
+        
+        double[] ret = new double[10];
+
+        //look at cell above and left to snake head, if it is food, set ret[0] to 1, if it is nothing set ret[0] to 0.5, it it is snake set ret[0] to -0.5 and if it is a wall set ret[0] to -1
+        //do this in a clockwise fashion for the rest of the cells around the snake head
+        
+        //up left
+        ret[0] = getfeatureValue(snakeHeadX - 1, snakeHeadY - 1);
+        //up
+        ret[1] = getfeatureValue(snakeHeadX - 1, snakeHeadY);
+        //up right
+        ret[2] = getfeatureValue(snakeHeadX - 1, snakeHeadY + 1);
+        //right
+        ret[3] = getfeatureValue(snakeHeadX, snakeHeadY + 1);
+        //down right
+        ret[4] = getfeatureValue(snakeHeadX + 1, snakeHeadY + 1);
+        //down
+        ret[5] = getfeatureValue(snakeHeadX + 1, snakeHeadY);
+        //down left
+        ret[6] = getfeatureValue(snakeHeadX + 1, snakeHeadY - 1);
+        //left
+        ret[7] = getfeatureValue(snakeHeadX, snakeHeadY - 1);
+
+        //feature 9 returns 1 if a food is in the column right of the snake head, 0 if a food is in the same column as the snake head and -1 if a food is in the column left of the snake head
+        for( int i = 0; i < boardSize; i++){
+            if(board[i][snakeHeadY] == 'F'){
+                if(i > snakeHeadX){
+                    ret[8] = 1;
+                }
+                else if(i == snakeHeadX){
+                    ret[8] = 0;
+                }
+                else{
+                    ret[8] = -1;
+                }
+            }
+        }
+
+        //feature 10 returns 1 if a food is in the row above the snake head, 0 if a food is in the same row as the snake head and -1 if a food is in the row below the snake head
+        for( int i = 0; i < boardSize; i++){
+            if(board[snakeHeadX][i] == 'F'){
+                if(i > snakeHeadY){
+                    ret[9] = 1;
+                }
+                else if(i == snakeHeadY){
+                    ret[9] = 0;
+                }
+                else{
+                    ret[9] = -1;
+                }
+            }
+        }
+
+        return ret;
+
     }
 
 }
