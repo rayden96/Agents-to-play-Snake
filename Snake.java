@@ -43,6 +43,12 @@ public class Snake {
 
     public char move(char direction) {
 
+        //check number of moves, if the snake has not moved in 1000 moves, end the game and return 'Z'
+        if (numMoves == 1000) {
+            return 'Z';
+        }
+
+
         switch (direction) {
             case 'U':
                 snakeHeadX--;
@@ -167,38 +173,64 @@ public class Snake {
         //left
         ret[7] = getfeatureValue(snakeHeadX, snakeHeadY - 1);
 
-        //feature 9 returns 1 if a food is in the column right of the snake head, 0 if a food is in the same column as the snake head and -1 if a food is in the column left of the snake head
-        for( int i = 0; i < boardSize; i++){
-            if(board[i][snakeHeadY] == 'F'){
-                if(i > snakeHeadX){
+        //feature 9 returns 1 if a food is in a cell to the left of the snake head, 0 if a food is in the same column as the snake head and -1 if a food is in a cell to the right of the snake head
+        for( int i = 0; i < snakeHeadX; i++){
+            for( int j = 0; j < boardSize; j++){
+                if(board[i][j] == 'F'){
                     ret[8] = 1;
                 }
-                else if(i == snakeHeadX){
-                    ret[8] = 0;
-                }
-                else{
+            }
+        }
+
+        for( int i = snakeHeadX; i < boardSize; i++){
+            for( int j = 0; j < boardSize; j++){
+                if(board[i][j] == 'F'){
                     ret[8] = -1;
                 }
             }
         }
 
-        //feature 10 returns 1 if a food is in the row above the snake head, 0 if a food is in the same row as the snake head and -1 if a food is in the row below the snake head
-        for( int i = 0; i < boardSize; i++){
-            if(board[snakeHeadX][i] == 'F'){
-                if(i > snakeHeadY){
+        for( int j = 0; j < boardSize; j++){
+            if(board[snakeHeadX][j] == 'F'){
+                ret[8] = 0;
+            }
+        }
+
+        //feature 10 returns 1 if a food is in a cell above the snake head, 0 if a food is in the same row as the snake head and -1 if a food is in a cell below the snake head
+        for( int i = 0; i < snakeHeadY; i++){
+            for( int j = 0; j < boardSize; j++){
+                if(board[j][i] == 'F'){
                     ret[9] = 1;
                 }
-                else if(i == snakeHeadY){
-                    ret[9] = 0;
-                }
-                else{
+            }
+        }
+
+        for( int i = snakeHeadY; i < boardSize; i++){
+            for( int j = 0; j < boardSize; j++){
+                if(board[j][i] == 'F'){
                     ret[9] = -1;
                 }
             }
         }
 
+        for( int j = 0; j < boardSize; j++){
+            if(board[j][snakeHeadY] == 'F'){
+                ret[9] = 0;
+            }
+        }
         return ret;
-
     }
+
+    //decide on feature input of GP. - GP will essentially use the same feature set to make functions and deductions.
+
+    //method to give back results.
+    public double[] getResults(){
+        double[] ret = new double[2];
+        ret[0] = score;
+        ret[1] = numMoves;
+        return ret;
+    }
+
+    //visualizer? - do potentially later
 
 }
