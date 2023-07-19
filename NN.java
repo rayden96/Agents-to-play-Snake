@@ -18,9 +18,14 @@ public class NN {
 
     Snake snake;
     int boardSize;
-    double fitness;
+
+    double[] averageScoreAndMoves = new double[2];
 
     Random rand;
+
+    //PSO variables
+    double[] bestWeights = new double[hiddenLayerSize * (inputLayerSize + 1) + outputLayerSize * (hiddenLayerSize + 1)];
+    double bestFitness = 0;
 
     public NN(double[] weights, int boardSize, Random rand){
         this.weights = weights;
@@ -77,8 +82,7 @@ public class NN {
     }
 
     public double getFitness(){
-        //pay 100 games and return the mean score over thos games.
-        fitness = 0;
+        //pay 100 games and return the mean score over those games.
 
         for (int i = 0; i < 100; i++){
             snake = new Snake(boardSize, rand);
@@ -91,18 +95,29 @@ public class NN {
                 initializeNN();
                 direction = getDirection();
             }
-            fitness += snake.score;
+            averageScoreAndMoves[0] += snake.score;
+            averageScoreAndMoves[1] += snake.numMoves;
+        }//potentially parallelize this
+        averageScoreAndMoves[0] /= 100;
+        averageScoreAndMoves[1] /= 100;
+
+        if(averageScoreAndMoves[0] > bestFitness){
+            bestFitness = averageScoreAndMoves[0];
+            bestWeights = weights;
         }
 
-        fitness /= 100;
-        return fitness;
+        return averageScoreAndMoves[0];
     }
 
+    public double[] returnOutput(){
+        return averageScoreAndMoves;
+    }
 
+    public void setWeights(double[] weights){
+        this.weights = weights;
+    }
 
-
-
-
-
-    
+    public double[] getWeights(){
+        return weights;
+    }
 }
