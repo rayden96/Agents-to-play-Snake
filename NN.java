@@ -19,18 +19,32 @@ public class NN {
     Snake snake;
     int boardSize;
 
-    double[] averageScoreAndMoves = new double[2];
+    double[] averageScoreAndMoves = new double[3];
 
     Random rand;
 
     //PSO variables
     double[] bestWeights = new double[hiddenLayerSize * (inputLayerSize + 1) + outputLayerSize * (hiddenLayerSize + 1)];
-    double bestFitness = 0;
+    double bestFitness = -1;
+
+    int numGames = 100;
 
     public NN(double[] weights, int boardSize, Random rand){
         this.weights = weights;
         this.boardSize = boardSize;
         this.rand = rand;
+    }
+
+    //full deep copy of an NN
+    public NN(NN nn){
+        this.weights = nn.cloneWeights();
+        this.boardSize = nn.boardSize;
+        this.rand = nn.rand;
+        this.averageScoreAndMoves = new double[3];
+
+        averageScoreAndMoves[0] = nn.averageScoreAndMoves[0];
+        averageScoreAndMoves[1] = nn.averageScoreAndMoves[1];
+        averageScoreAndMoves[2] = nn.averageScoreAndMoves[2];
     }
 
     public void initializeNN(){
@@ -83,27 +97,69 @@ public class NN {
 
     public double getFitness(){
         //pay 100 games and return the mean score over those games.
+        averageScoreAndMoves[0] = 0;
+        averageScoreAndMoves[1] = 0;
+        averageScoreAndMoves[2] = 0;
 
-        for (int i = 0; i < 100; i++){
+        for (int i = 0; i < numGames; i++){
             snake = new Snake(boardSize, rand);
             
             initializeNN();
             char direction = getDirection();
 
             //play the game
-            while (snake.move(direction) == 'C'){
+            while (snake.move(direction) != 'X'){
                 initializeNN();
                 direction = getDirection();
             }
+           // System.out.println("Game Over");
             averageScoreAndMoves[0] += snake.score;
             averageScoreAndMoves[1] += snake.numMoves;
+            if(snake.score == boardSize * boardSize - 1){
+                averageScoreAndMoves[2]++;
+            }
         }//potentially parallelize this
-        averageScoreAndMoves[0] /= 100;
-        averageScoreAndMoves[1] /= 100;
+        averageScoreAndMoves[0] /= numGames;
+        averageScoreAndMoves[1] /= numGames;
 
         if(averageScoreAndMoves[0] > bestFitness){
             bestFitness = averageScoreAndMoves[0];
-            bestWeights = weights;
+            bestWeights = cloneWeights();
+        }
+
+        return averageScoreAndMoves[0];
+    }
+
+    public double getFitness2(){
+        //pay 100 games and return the mean score over those games.
+        
+        averageScoreAndMoves[0] = 0;
+        averageScoreAndMoves[1] = 0;
+        averageScoreAndMoves[2] = 0;
+
+        for (int i = 0; i < 1; i++){
+            snake = new Snake(boardSize, rand);
+            
+            initializeNN();
+            char direction = getDirection();
+            snake.printBoard();
+
+            //play the game
+            while (snake.move(direction) != 'X' || snake.move(direction) != 'W'){
+                initializeNN();
+                direction = getDirection();
+                snake.printBoard();
+            }
+           // System.out.println("Game Over");
+            averageScoreAndMoves[0] += snake.score;
+            averageScoreAndMoves[1] += snake.numMoves;
+        }//potentially parallelize this
+        averageScoreAndMoves[0] /= 1;
+        averageScoreAndMoves[1] /= 1;
+
+        if(averageScoreAndMoves[0] > bestFitness){
+            bestFitness = averageScoreAndMoves[0];
+            bestWeights = cloneWeights();
         }
 
         return averageScoreAndMoves[0];
@@ -119,5 +175,14 @@ public class NN {
 
     public double[] getWeights(){
         return weights;
+    }
+
+    //clone copy the weights
+    public double[] cloneWeights(){
+        double[] clone = new double[weights.length];
+        for (int i = 0; i < weights.length; i++){
+            clone[i] = weights[i];
+        }
+        return clone;
     }
 }

@@ -43,9 +43,12 @@ public class Snake {
 
     public char move(char direction) {
 
+        //printBoard();
+        //System.out.println("Moving " + direction);
+
         //check number of moves, if the snake has not moved in 1000 moves, end the game and return 'Z'
         if (numMoves == 1000) {
-            return 'Z';
+            return 'X';
         }
 
 
@@ -72,7 +75,7 @@ public class Snake {
         }
 
         //check if snake has eaten itself -- game loss
-        for (int i = 0; i < snakeLength; i++) {
+        for (int i = 0; i < snakeLength-1; i++) {
             if (snakeHeadX == snakeX[i] && snakeHeadY == snakeY[i]) {
                 return 'X';
             }
@@ -84,6 +87,17 @@ public class Snake {
         if (snakeHeadX == foodX && snakeHeadY == foodY) {
             snakeLength++;
             score++;
+
+            //update snake body
+            for (int i = snakeLength - 1; i > 0; i--) {
+                snakeX[i] = snakeX[i - 1];
+                snakeY[i] = snakeY[i - 1];
+            }
+            snakeX[0] = snakeHeadX;
+            snakeY[0] = snakeHeadY;
+
+            //update board
+            board[snakeHeadX][snakeHeadY] = 'S';
 
             //check if snake has filled the board
             if (snakeLength == boardSize * boardSize) {
@@ -97,30 +111,19 @@ public class Snake {
             } while (board[foodX][foodY] == 'S');
             board[foodX][foodY] = 'F';
 
-            //update snake body
-            for (int i = snakeLength - 1; i > 0; i--) {
-                snakeX[i] = snakeX[i - 1];
-                snakeY[i] = snakeY[i - 1];
-            }
-            snakeX[0] = snakeHeadX;
-            snakeY[0] = snakeHeadY;
-
-            //update board
-            board[snakeHeadX][snakeHeadY] = 'S';
+            
         }
         //check if snake has not eaten food
-        else {
-            //update snake body
+        else { 
+         //update the snake and board to reflect the movement made
+            board[snakeX[snakeLength - 1]][snakeY[snakeLength - 1]] = ' ';
+            board[snakeHeadX][snakeHeadY] = 'S';
             for (int i = snakeLength - 1; i > 0; i--) {
                 snakeX[i] = snakeX[i - 1];
                 snakeY[i] = snakeY[i - 1];
             }
             snakeX[0] = snakeHeadX;
             snakeY[0] = snakeHeadY;
-
-            //update board
-            board[snakeHeadX][snakeHeadY] = 'S';
-            board[snakeX[snakeLength - 1]][snakeY[snakeLength - 1]] = ' ';
         }
 
         numMoves++;
@@ -232,5 +235,21 @@ public class Snake {
     }
 
     //visualizer? - do potentially later
+    //print out the board
+    public void printBoard() {
+        System.out.println("Score: " + score);
+        System.out.println("Number of Moves: " + numMoves);
+        System.out.println("Snake Length: " + snakeLength);
+        System.out.println("Snake Head: (" + snakeHeadX + ", " + snakeHeadY + ")");
+        System.out.println("Food: (" + foodX + ", " + foodY + ")");
+        System.out.println("Board: ");
+        for (int i = 0; i < boardSize; i++) {
+            System.out.print("|");
+            for (int j = 0; j < boardSize; j++) {
+                System.out.print(board[i][j] + "|");
+            }
+            System.out.println();
+        }
+    }
 
 }
