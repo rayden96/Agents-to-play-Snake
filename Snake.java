@@ -252,4 +252,37 @@ public class Snake {
         }
     }
 
+    public boolean nextMoveLosesGame(char direction){
+        //check if the next move will lose the game
+        int nextX = snakeHeadX;
+        int nextY = snakeHeadY;
+        switch (direction) {
+            case 'U':
+                nextX--;
+                break;
+            case 'D':
+                nextX++;
+                break;
+            case 'L':
+                nextY--;
+                break;
+            case 'R':
+                nextY++;
+                break;
+        }
+
+        //check if snake is out of bounds - game loss
+        if (nextX < 0 || nextX >= boardSize || nextY < 0 || nextY >= boardSize) {
+            return true;
+        }
+
+        //check if snake has eaten itself -- game loss
+        for (int i = 0; i < snakeLength-1; i++) {
+            if (nextX == snakeX[i] && nextY == snakeY[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

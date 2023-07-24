@@ -108,16 +108,16 @@ public class NN {
             char direction = getDirection();
 
             //play the game
-            while (snake.move(direction) != 'X'){
+            while (snake.move(direction) != 'X' && snake.move(direction) != 'W'){
                 initializeNN();
                 direction = getDirection();
             }
-           // System.out.println("Game Over");
             averageScoreAndMoves[0] += snake.score;
             averageScoreAndMoves[1] += snake.numMoves;
-            if(snake.score == boardSize * boardSize - 1){
+            if (snake.move(direction) == 'W'){
                 averageScoreAndMoves[2]++;
             }
+
         }//potentially parallelize this
         averageScoreAndMoves[0] /= numGames;
         averageScoreAndMoves[1] /= numGames;
@@ -145,14 +145,17 @@ public class NN {
             snake.printBoard();
 
             //play the game
-            while (snake.move(direction) != 'X' || snake.move(direction) != 'W'){
+            while (snake.move(direction) != 'X' && snake.move(direction) != 'W'){
                 initializeNN();
                 direction = getDirection();
                 snake.printBoard();
             }
-           // System.out.println("Game Over");
+              // System.out.println("Game Over");
             averageScoreAndMoves[0] += snake.score;
             averageScoreAndMoves[1] += snake.numMoves;
+            if (snake.move(direction) == 'W'){
+                averageScoreAndMoves[2]++;
+            }
         }//potentially parallelize this
         averageScoreAndMoves[0] /= 1;
         averageScoreAndMoves[1] /= 1;
