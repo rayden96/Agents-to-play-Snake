@@ -1,5 +1,6 @@
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class NN {
     //the nueral network to play and learn snake
@@ -100,25 +101,28 @@ public class NN {
         averageScoreAndMoves[0] = 0;
         averageScoreAndMoves[1] = 0;
         averageScoreAndMoves[2] = 0;
-
+            
         for (int i = 0; i < numGames; i++){
+
             snake = new Snake(boardSize, rand);
             
             initializeNN();
             char direction = getDirection();
-
+            char state = snake.move(direction);
             //play the game
-            while (snake.move(direction) != 'X' && snake.move(direction) != 'W'){
+            while (state != 'X' && state != 'W'){
+                //snake.printBoard();
                 initializeNN();
                 direction = getDirection();
+                
+                state = snake.move(direction);
             }
             averageScoreAndMoves[0] += snake.score;
             averageScoreAndMoves[1] += snake.numMoves;
-            if (snake.move(direction) == 'W'){
+            if (snake.score == snake.boardSize * snake.boardSize - 1){
                 averageScoreAndMoves[2]++;
             }
-
-        }//potentially parallelize this
+        }
         averageScoreAndMoves[0] /= numGames;
         averageScoreAndMoves[1] /= numGames;
 
@@ -143,17 +147,18 @@ public class NN {
             initializeNN();
             char direction = getDirection();
             snake.printBoard();
-
+            char state = snake.move(direction);
             //play the game
-            while (snake.move(direction) != 'X' && snake.move(direction) != 'W'){
+            while (state != 'X' && state != 'W'){
                 initializeNN();
                 direction = getDirection();
                 snake.printBoard();
+                state = snake.move(direction);
             }
               // System.out.println("Game Over");
             averageScoreAndMoves[0] += snake.score;
             averageScoreAndMoves[1] += snake.numMoves;
-            if (snake.move(direction) == 'W'){
+            if (snake.score == snake.boardSize * snake.boardSize - 1){
                 averageScoreAndMoves[2]++;
             }
         }//potentially parallelize this

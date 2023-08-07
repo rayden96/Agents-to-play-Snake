@@ -5,9 +5,9 @@ public class Solver {
 
     public static void main(String[] args) {
 
-         Random rand = new Random(114);
+        Random rand = new Random(116);
 
-        // PSOTrainedNN pso = new PSOTrainedNN(100, 9, rand);
+        // PSOTrainedNN pso = new PSOTrainedNN(100, 3, rand);
         // NN best = pso.train(1000);
 
         // best.getFitness2();
@@ -24,9 +24,13 @@ public class Solver {
     //         snake.printBoard();
     //     }
 
-    Randomizer randomizer = new Randomizer(9, rand);
-    double[] ret = randomizer.run(100);
+    // Randomizer randomizer = new Randomizer(3, rand);
+    // double[] ret = randomizer.run(100);
 
+    // System.out.println("Average score: " + ret[0] + " Average moves: " + ret[1] + " Games won: " + ret[2]);
+
+    TowardsLessDense towardsLessDense = new TowardsLessDense(3, rand);
+    double[] ret = towardsLessDense.run(100);
     System.out.println("Average score: " + ret[0] + " Average moves: " + ret[1] + " Games won: " + ret[2]);
 
 

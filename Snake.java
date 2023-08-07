@@ -46,7 +46,7 @@ public class Snake {
         //printBoard();
         //System.out.println("Moving " + direction);
 
-        //check number of moves, if the snake has not moved in 1000 moves, end the game and return 'Z'
+        //check number of moves, if the snake has not moved in 1000 moves, end the game and return
         if (numMoves == 1000) {
             return 'X';
         }
