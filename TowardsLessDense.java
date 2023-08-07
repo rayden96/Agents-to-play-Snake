@@ -38,78 +38,134 @@ public class TowardsLessDense {
                 //snake.printBoard();
                 double[] featureVector = snake.getFeatureInput();
                 double[] densities = calculateDensities(featureVector, snake.foodX, snake.foodY, snake.snakeHeadX, snake.snakeHeadY);
-                //get the lowest density from the array, if there is a tie, choose randomly from the tied directions
-                double lowestDensity = 100;
-                int[] lowestDensityIndices = new int[4];
-                int numTied = 0;
-                for(int j = 0; j<4; j++){
-                    if(densities[j] < lowestDensity){
-                        lowestDensity = densities[j];
-                        lowestDensityIndices[0] = j;
-                        numTied = 1;
-                    }
-                    else if(densities[j] == lowestDensity){
-                        lowestDensityIndices[numTied] = j;
-                        numTied++;
-                    }
-                }
-                int direction = lowestDensityIndices[rand.nextInt(numTied)];
-                
-                if(direction == 0){
-                    directionChar = 'U';
-                }
-                else if(direction == 1){
-                    directionChar = 'R';
-                }
-                else if(direction == 2){
-                    directionChar = 'D';
-                }
-                else if(direction == 3){
-                    directionChar = 'L';
-                }
-                //check if next move will kill the snake, if it does, choose the next lowest density unless all moves will kill the snake
-                if(snake.nextMoveLosesGame(directionChar)){
-                    //check if all moves will kill the snake
-                    boolean allMovesLose = true;
-                    for(int j = 0; j<4; j++){
-                        if(!snake.nextMoveLosesGame(directionChar)){
-                            allMovesLose = false;
+                //create an array that stores the indexes of increments in descending order
+                int[] sotredDensities = new int[4];
+                int[] listInOrder = new int[4];
+                sotredDensities[0] = 0;
+                sotredDensities[1] = 1;
+                sotredDensities[2] = 2;
+                sotredDensities[3] = 3;
+                for(int j = 0; j < 4; j++){
+                    for(int k = j+1; k < 4; k++){
+                        if(densities[sotredDensities[j]] > densities[sotredDensities[k]]){
+                            int temp = sotredDensities[j];
+                            sotredDensities[j] = sotredDensities[k];
+                            sotredDensities[k] = temp;
                         }
                     }
-                    if(allMovesLose){
-                        direction = lowestDensityIndices[0];
+                }
+
+                if(densities[sotredDensities[0]] == densities[sotredDensities[1]]){
+                    if(densities[sotredDensities[1]] == densities[sotredDensities[2]]){
+                        if(densities[sotredDensities[2]] == densities[sotredDensities[3]]){
+                            //all the same, fill ListInOrder randomly
+                            listInOrder[0] = sotredDensities[rand.nextInt(4)];
+                            while(listInOrder[1] == listInOrder[0]){
+                                listInOrder[1] = sotredDensities[rand.nextInt(4)];
+                            }
+                            while(listInOrder[2] == listInOrder[0] || listInOrder[2] == listInOrder[1]){
+                                listInOrder[2] = sotredDensities[rand.nextInt(4)];
+                            }
+                            while(listInOrder[3] == listInOrder[0] || listInOrder[3] == listInOrder[1] || listInOrder[3] == listInOrder[2]){
+                                listInOrder[3] = sotredDensities[rand.nextInt(4)];
+                            }
+                        }
+                        else{
+                            //3 are the same, fill listInOrder with the 3 that are the same
+                            listInOrder[0] = sotredDensities[rand.nextInt(3)];
+                            while(listInOrder[1] == listInOrder[0]){
+                                listInOrder[1] = sotredDensities[rand.nextInt(3)];
+                            }
+                            while(listInOrder[2] == listInOrder[0] || listInOrder[2] == listInOrder[1]){
+                                listInOrder[2] = sotredDensities[rand.nextInt(3)];
+                            }
+                            listInOrder[3] = sotredDensities[3];
+                        }
+                            
                     }
                     else{
-                        //find the next lowest density
-                        double nextLowestDensity = 100;
-                        int[] nextLowestDensityIndices = new int[4];
-                        int numNextTied = 0;
-                        for(int j = 0; j<4; j++){
-                            if(densities[j] < nextLowestDensity && densities[j] > lowestDensity){
-                                nextLowestDensity = densities[j];
-                                nextLowestDensityIndices[0] = j;
-                                numNextTied = 1;
+                        //2 are the same, fill listInOrder with the 2 that are the same
+                        listInOrder[0] = sotredDensities[rand.nextInt(2)];
+                        while(listInOrder[1] == listInOrder[0]){
+                            listInOrder[1] = sotredDensities[rand.nextInt(2)];
+                        }
+                        if(sotredDensities[2] == sotredDensities[3]){
+                            if(rand.nextInt(2) > 0){
+                                listInOrder[2] = sotredDensities[2];
+                                listInOrder[3] = sotredDensities[3];
                             }
-                            else if(densities[j] == nextLowestDensity){
-                                nextLowestDensityIndices[numNextTied] = j;
-                                numNextTied++;
+                            else {
+                                listInOrder[2] = sotredDensities[3];
+                                listInOrder[3] = sotredDensities[2];
                             }
                         }
-                        direction = nextLowestDensityIndices[rand.nextInt(numNextTied)];
-
+                        else{
+                            listInOrder[2] = sotredDensities[2];
+                            listInOrder[3] = sotredDensities[3];
+                        }
                     }
-                    if(direction == 0){
-                        directionChar = 'U';
+                }
+                else{
+                    listInOrder[0] = sotredDensities[0];
+                    if(sotredDensities[1] == sotredDensities[2]){
+                        if(sotredDensities[2] == sotredDensities[3]){
+                            //next three the same, fill randomly
+                            listInOrder[1] = sotredDensities[rand.nextInt(3)+1];
+                            while(listInOrder[2] == listInOrder[1]){
+                                listInOrder[2] = sotredDensities[rand.nextInt(3)+1];
+                            }
+                            while(listInOrder[3] == listInOrder[1] || listInOrder[3] == listInOrder[2]){
+                                listInOrder[3] = sotredDensities[rand.nextInt(3)+1];
+                            }
+                        }
+                        else{
+                            //next two the same, fill listInOrder with the 2 that are the same
+                            listInOrder[1] = sotredDensities[rand.nextInt(2)+1];
+                            while(listInOrder[2] == listInOrder[1]){
+                                listInOrder[2] = sotredDensities[rand.nextInt(2)+1];
+                            }
+                            listInOrder[3] = sotredDensities[3];
+                        }
                     }
-                    else if(direction == 1){
-                        directionChar = 'R';
+                    else{
+                        listInOrder[1] = sotredDensities[1];
+                        if(sotredDensities[2] == sotredDensities[3]){
+                            if(rand.nextInt(2) > 0){
+                                listInOrder[2] = sotredDensities[2];
+                                listInOrder[3] = sotredDensities[3];
+                            }
+                            else {
+                                listInOrder[2] = sotredDensities[3];
+                                listInOrder[3] = sotredDensities[2];
+                            }
+                        }
+                        else{
+                            listInOrder[2] = sotredDensities[2];
+                            listInOrder[3] = sotredDensities[3];
+                        }
                     }
-                    else if(direction == 2){
-                        directionChar = 'D';
+                }
+            
+                if(snake.nextMoveLosesGame(getDirection(listInOrder, 0))){
+                    if(snake.nextMoveLosesGame(getDirection(listInOrder, 1))){
+                        if(snake.nextMoveLosesGame(getDirection(listInOrder, 2))){
+                            if(snake.nextMoveLosesGame(getDirection(listInOrder, 3))){
+                                directionChar = getDirection(listInOrder, 0);
+                            }
+                            else{
+                                directionChar = getDirection(listInOrder, 3);
+                            }
+                        }
+                        else{
+                            directionChar = getDirection(listInOrder, 2);
+                        }
                     }
-                    else if(direction == 3){
-                        directionChar = 'L';
+                    else{
+                        directionChar = getDirection(listInOrder, 1);
                     }
+                }
+                else{
+                    directionChar = getDirection(listInOrder, 0);
                 }
                 //System.out.println("Densities: " + densities[0] + " " + densities[1] + " " + densities[2] + " " + densities[3] + " " + " Direction: " + directionChar);
                 flag = snake.move(directionChar);
@@ -184,6 +240,23 @@ public class TowardsLessDense {
 
         return ret;
 
+    }
+
+    public char getDirection(int[] sortedIncrements, int val){
+        char directionChar = ' ';
+        if(sortedIncrements[val] == 0){
+            directionChar = 'U';
+        }
+        if(sortedIncrements[val] == 1){
+            directionChar = 'R';
+        }
+        if(sortedIncrements[val] == 2){
+            directionChar = 'D';
+        }
+        if(sortedIncrements[val] == 3){
+            directionChar = 'L';
+        }
+        return directionChar;
     }
 
     //play games with moves based on the lowest density score for each move
