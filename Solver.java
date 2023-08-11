@@ -29,14 +29,16 @@ public class Solver {
 
     // System.out.println("Average score: " + ret[0] + " Average moves: " + ret[1] + " Games won: " + ret[2]);
 
-    TowardsLessDense towardsLessDense = new TowardsLessDense(3, rand);
-    double[] ret = towardsLessDense.run(100);
-    System.out.println("Average score: " + ret[0] + " Average moves: " + ret[1] + " Games won: " + ret[2]);
+    // TowardsLessDense towardsLessDense = new TowardsLessDense(3, rand);
+    // double[] ret = towardsLessDense.run(100);
+    // System.out.println("Average score: " + ret[0] + " Average moves: " + ret[1] + " Games won: " + ret[2]);
 
-    WallHugger wallHugger = new WallHugger(rand, 3);
-    double[] ret2 = wallHugger.run(100);
-    System.out.println("Average score: " + ret2[0] + " Average moves: " + ret2[1] + " Games won: " + ret2[2]);
+    // WallHugger wallHugger = new WallHugger(rand, 3);
+    // double[] ret2 = wallHugger.run(100);
+    // System.out.println("Average score: " + ret2[0] + " Average moves: " + ret2[1] + " Games won: " + ret2[2]);
 
+    GPRunnerInitial gprunner = new GPRunnerInitial(2000, 500, 200, 5, 3, rand);
+    gprunner.run();
 
 
     }
