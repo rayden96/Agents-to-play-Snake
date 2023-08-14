@@ -1,3 +1,10 @@
+//GP Initial
+
+//seems o be performing quite well, only problem is that it has no sense of the future. It will move into 
+//a sure death position to get food - very greedy.
+
+
+
 import java.util.Random;
 
 public class GPInitial {
@@ -5,10 +12,10 @@ public class GPInitial {
     //take in the snakeplayingtrees and perform GP
 
     //function set: (arity 2)
-    // - ifFood1Up - if food is in cell 2
-    // - ifFood1Right - if food is in cell 4
-    // - ifFood1Down - if food is in cell 6
-    // - ifFood1Left - if food is in cell 8
+    // - A: If food in column up
+    // - B: If food in row right
+    // - C: If food in column down
+    // - D: If food in row left
 
     // - ifDanger1Up - if danger is in cell 2
     // - ifDanger1Right - if danger is in cell 4
@@ -31,7 +38,7 @@ public class GPInitial {
         this.boardSize = boardSize;
         fitness = 0;
 
-        root = initialGeneration(30, 0);
+        root = initialGeneration(15, 0);
     }
 
     //use grow method to grow trees
@@ -54,10 +61,10 @@ public class GPInitial {
         }
     }
 
-    public double playAndGetFitness(int numGames){
+    public double playAndGetFitness(int numGames, Random newRand){
         fitness = 0;
         for(int i = 0; i < numGames; i++){
-            Snake snake = new Snake(boardSize, rand);
+            Snake snake = new Snake(boardSize, newRand);
             double[] featureVector = new double[10];
             char move;
             char status = 'C';
@@ -66,7 +73,31 @@ public class GPInitial {
                 move = decideMove(featureVector, root);
                 status = snake.move(move);
             }
-            fitness += (boardSize * boardSize) - snake.score;
+            fitness += (boardSize * boardSize -1) - snake.score;
+            if(snake.score == 0)fitness += snake.getDistance();
+            //add a value to the fitness based on the numMoves [0, 1]
+            fitness += (double)snake.numMoves / 1000;
+        }
+        fitness = fitness / numGames;
+        return fitness;
+    }
+
+    //for testing
+    public double playAndGetFitness2(int numGames){
+        fitness = 0;
+        for(int i = 0; i < numGames; i++){
+            Snake snake = new Snake(boardSize, rand);
+            double[] featureVector = new double[10];
+            char move;
+            char status = 'C';
+            snake.printBoard();
+            while(status != 'W' && status != 'X'){
+                featureVector = snake.getFeatureInput();
+                move = decideMove(featureVector, root);
+                status = snake.move(move);
+                snake.printBoard();
+            }
+            fitness += (boardSize * boardSize -1) - snake.score;
         }
         fitness = fitness / numGames;
         return fitness;
@@ -75,7 +106,7 @@ public class GPInitial {
     public char decideMove(double[] featureVector, NodeInitial node){
         if(node.isTerminal == false){
             if(node.value == 'A'){
-                if(featureVector[1] == 1){
+                if(featureVector[8] == 0 && featureVector[9] == 1){
                     return decideMove(featureVector, node.leftChild);
                 }
                 else{
@@ -83,7 +114,7 @@ public class GPInitial {
                 }
             }
             else if(node.value == 'B'){
-                if(featureVector[3] == 1){
+                if(featureVector[8] == -1 && featureVector[9] == 0){
                     return decideMove(featureVector, node.leftChild);
                 }
                 else{
@@ -91,7 +122,7 @@ public class GPInitial {
                 }
             }
             else if(node.value == 'C'){
-                if(featureVector[5] == 1){
+                if(featureVector[8] == 0 && featureVector[9] == -1){
                     return decideMove(featureVector, node.leftChild);
                 }
                 else{
@@ -99,7 +130,7 @@ public class GPInitial {
                 }
             }
             else if(node.value == 'D'){
-                if(featureVector[7] == 1){
+                if(featureVector[8] == 1 && featureVector[9] == 0){
                     return decideMove(featureVector, node.leftChild);
                 }
                 else{
@@ -161,6 +192,7 @@ public class GPInitial {
     public GPInitial copyTree(){
         GPInitial newTree = new GPInitial(MaxDepth, rand, boardSize);
         newTree.root = root.copyNode();
+        newTree.fitness = fitness;
         return newTree;
     }
 
@@ -202,6 +234,10 @@ public class GPInitial {
         statistics[0] = statistics[0] / numGames;
         statistics[1] = statistics[1] / numGames;
         return statistics;
+    }
+
+    public String printTree(){
+        return root.printTree();
     }
 
 }

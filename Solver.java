@@ -5,7 +5,7 @@ public class Solver {
 
     public static void main(String[] args) {
 
-        Random rand = new Random(119);
+        Random rand = new Random(139);
 
         // PSOTrainedNN pso = new PSOTrainedNN(100, 3, rand);
         // NN best = pso.train(1000);
@@ -37,8 +37,9 @@ public class Solver {
     // double[] ret2 = wallHugger.run(100);
     // System.out.println("Average score: " + ret2[0] + " Average moves: " + ret2[1] + " Games won: " + ret2[2]);
 
-    GPRunnerInitial gprunner = new GPRunnerInitial(2000, 500, 200, 5, 3, rand);
-    gprunner.run();
+    GPRunnerInitial gprunner = new GPRunnerInitial(100, 500, 10, 6, 3, rand);
+    GPInitial gp = gprunner.run();
+    gp.playAndGetFitness2(5);
 
 
     }

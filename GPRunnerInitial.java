@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class GPRunnerInitial {
 
@@ -14,8 +15,13 @@ public class GPRunnerInitial {
 
     int boardSize;
 
-    int crossoverChance = 5;
-    int mutationChance = 5;
+    int crossoverChance = 10;
+    int mutationChance = 10;
+
+    GPInitial bestTree;
+    double bestFitness = 1000000;
+
+    Random[] randArray;
 
     public GPRunnerInitial(int populationSize, int generations, int tournamentSize, int MaxDepth, int boardSize, Random rand) {
         this.populationSize = populationSize;
@@ -29,50 +35,40 @@ public class GPRunnerInitial {
             population[i] = new GPInitial(MaxDepth, rand, boardSize);
         }
         tournament = new GPInitial[tournamentSize];
+
+        //assign randArray with random seeds
+        randArray = new Random[populationSize];
+        for(int i = 0; i < 100; i++){
+            randArray[i] = new Random(rand.nextInt());
+        }
     }
 
-    public void run(){
+    public GPInitial run(){
+        IntStream.range(0, populationSize).parallel().forEach(j -> {
+            fitness[j] = population[j].playAndGetFitness(100, randArray[j]);
+        });
         for(int i = 0; i < generations; i++){
-            for(int j = 0; j < populationSize; j++){
-                fitness[j] = population[j].playAndGetFitness(50);
-            }
-            System.out.println("Generation " + i + " complete");
+            
+            System.out.println("Generation " + (i+1));
             GPInitial[] newPopulation = new GPInitial[populationSize];
 
-            // //perform fast sort on fitness and population based on fitness
-            // for(int j = 0; j < populationSize; j++){
-            //     int maxIndex = j;
-            //     for(int k = j + 1; k < populationSize; k++){
-            //         if(fitness[k] > fitness[maxIndex]){
-            //             maxIndex = k;
-            //         }
-            //     }
-            //     double tempFitness = fitness[j];
-            //     fitness[j] = fitness[maxIndex];
-            //     fitness[maxIndex] = tempFitness;
-            //     GPInitial temp = population[j];
-            //     population[j] = population[maxIndex];
-            //     population[maxIndex] = temp;
-            // }
-            // //copy over best x number of individuals where x is 1% of the population size
-            // int numCopied = populationSize / 100;
-            // for(int j = 0; j < numCopied; j++){
-            //     newPopulation[j] = population[j].copyTree();
-            // }
-
-            //eliteism above - very slow - potentially optimize
-
-            //copy over fittest individual
-            int maxIndex = 0;
-            for(int j = 1; j < populationSize; j++){
-                if(fitness[j] > fitness[maxIndex]){
-                    maxIndex = j;
+            //for 5% of population, run tournament selection and just copy the winner
+            for(int j = 0; j < populationSize / 20; j++){
+                //select the tournament
+                for(int k = 0; k < tournamentSize; k++){
+                    tournament[k] = population[rand.nextInt(populationSize)];
                 }
+                //find the best
+                GPInitial best = tournament[0];
+                for(int k = 1; k < tournamentSize; k++){
+                    if(tournament[k].fitness < best.fitness){
+                        best = tournament[k];
+                    }
+                }
+                newPopulation[j] = best.copyTree();
             }
-            newPopulation[0] = population[maxIndex].copyTree();
-            
 
-            for(int j = 1; j < populationSize; j++){
+            for(int j = populationSize/20; j < populationSize; j++){
                 //select the tournament
                 for(int k = 0; k < tournamentSize; k++){
                     tournament[k] = population[rand.nextInt(populationSize)];
@@ -81,32 +77,72 @@ public class GPRunnerInitial {
                 GPInitial best = tournament[0];
                 GPInitial secondBest = tournament[1];
                 for(int k = 1; k < tournamentSize; k++){
-                    if(tournament[k].fitness > best.fitness){
+                    if(tournament[k].fitness < best.fitness){
                         secondBest = best;
                         best = tournament[k];
                     }
-                    else if(tournament[k].fitness > secondBest.fitness){
+                    else if(tournament[k].fitness < secondBest.fitness){
                         secondBest = tournament[k];
                     }
                 }
                 newPopulation[j++] = best.crossoverTree(secondBest, crossoverChance);
                 if(j == populationSize) break;
+                
+                //get a new tournament and copy over a mutated tree
+                for(int k = 0; k < tournamentSize; k++){
+                    tournament[k] = population[rand.nextInt(populationSize)];
+                }
+                //find the best
+                best = tournament[0];
+                for(int k = 1; k < tournamentSize; k++){
+                    if(tournament[k].fitness < best.fitness){
+                        best = tournament[k];
+                    }
+                }
                 newPopulation[j] = best.copyTree();
                 newPopulation[j].mutateTree(mutationChance);
+
             }
             population = newPopulation;
 
+            IntStream.range(0, populationSize).parallel().forEach(j -> {
+                fitness[j] = population[j].playAndGetFitness(100, randArray[j]);
+            });
             //get the best from the population
             GPInitial best = population[0];
             for(int j = 1; j < populationSize; j++){
-                if(population[j].fitness > best.fitness){
-                    best = population[j];
+                if(population[j].fitness < best.fitness){
+                    best = population[j].copyTree();
+                    best.fitness = population[j].fitness;
                 }
             }
-            System.out.println("Best fitness: " + best.fitness);
+
+            System.out.println(best.fitness);
+            System.out.println(bestFitness);
+            
+            if(best.fitness < bestFitness ){
+                bestFitness = best.fitness;
+                this.bestTree = best.copyTree();
+            }
+
             double[] stats = best.playAndGetStatistics(100);
-            System.out.println("Average score: " + stats[0] + " Average moves: " + stats[1] + " Number of wins: " + stats[2]);
+            System.out.println("Best Tree from this generation: ");
+            System.out.println("Average score: " + stats[0] + " Average moves: " + stats[1] + " Games won: " + stats[2]);
+
+
+            System.out.println("Best Tree so far: ");
+            stats = bestTree.playAndGetStatistics(100);
+            System.out.println("Average score: " + stats[0] + " Average moves: " + stats[1] + " Games won: " + stats[2]);
+            // System.out.println(best.printTree());
+            // //wait two seconds
+            // try{
+            //     Thread.sleep(2000);
+            // }
+            // catch(Exception e){
+            //     System.out.println("Error");
+            // }
         }
+        return bestTree;
     }
     
 }

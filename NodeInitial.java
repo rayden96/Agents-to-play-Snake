@@ -12,10 +12,10 @@ public class NodeInitial {
 
 
     //function set: (arity 2)
-    // - ifFood1Up - if food is in cell 2 - 'A'
-    // - ifFood1Right - if food is in cell 4 - 'B'
-    // - ifFood1Down - if food is in cell 6 - 'C'
-    // - ifFood1Left - if food is in cell 8 - 'D'
+    // - A: If food in column up
+    // - B: If food in row right
+    // - C: If food in column down
+    // - D: If food in row left
 
     // - ifDanger1Up - if danger is in cell 2 - 'E'
     // - ifDanger1Right - if danger is in cell 4 - 'F'
@@ -113,6 +113,50 @@ public class NodeInitial {
                     return false;
                 }
             }
+        }
+    }
+
+    public String printTree(){
+        if(isTerminal){
+            if(value == 'U'){
+                return "moveUp";
+            }
+            else if(value == 'R'){
+                return "moveRight";
+            }
+            else if(value == 'D'){
+                return "moveDown";
+            }
+            else{
+                return "moveLeft";
+            }
+        }
+        else{
+            if(value == 'A'){
+                return "ifFoodUp(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'B'){
+                return "ifFoodRight(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'C'){
+                return "ifFoodDown(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'D'){
+                return "ifFoodLeft(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'E'){
+                return "ifDanger1Up(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'F'){
+                return "ifDanger1Right(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'G'){
+                return "ifDanger1Down(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'H'){
+                return "ifDanger1Left(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else throw new IllegalArgumentException("Invalid node value");
         }
     }
 

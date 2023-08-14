@@ -283,6 +283,12 @@ public class Snake {
             }
         }
         return false;
+
+    }
+    
+    //get the euclidean distance from head to food
+    public double getDistance(){
+        return Math.sqrt(Math.pow(snakeHeadX - foodX, 2) + Math.pow(snakeHeadY - foodY, 2));
     }
 
 }
