@@ -36,12 +36,12 @@ public class PSOTrainedNN {
             population[i] = new NN(weights, boardSize, randForNN);
         }
 
-        System.out.println("Initialized population");
+        //System.out.println("Initialized population");
     }
 
     public NN train(int iterations){
 
-        System.out.println("Starting Training phase");
+        //System.out.println("Starting Training phase");
         //get the best NN from the population
         IntStream.range(0, populationSize).parallel().forEach(i -> {
             population[i].getFitness();
@@ -57,18 +57,19 @@ public class PSOTrainedNN {
 
         //run the iterations:
         for(int i = 0; i< iterations; i++){
-            System.out.println("Iteration: " + i + " Best NN average score: " + bestNN.averageScoreAndMoves[0] + " and average moves: " + bestNN.averageScoreAndMoves[1] + " and games won: " + bestNN.averageScoreAndMoves[2]);
+            //System.out.println("Iteration: " + i + " Best NN average score: " + bestNN.averageScoreAndMoves[0] + " and average moves: " + bestNN.averageScoreAndMoves[1] + " and games won: " + bestNN.averageScoreAndMoves[2]);
             //loop through each NN in parallel and update the weights
             IntStream.range(0, populationSize).parallel().forEach(j -> {
                 //get the weights of the NN
-                double[] weights = population[j].weights;
+                double[] weights = population[j].cloneWeights();
 
                 //set the velocity of the NN for each weight in a float array called velocities
                 double[] velocities = new double[weights.length];
                 for (int k = 0; k < weights.length; k++){
-                    velocities[k] = w * weights[k] + c1 * population[j].rand.nextDouble() * (population[j].bestWeights[k]- weights[k]) + c2 * population[j].rand.nextDouble() * (bestNN.weights[k]  - weights[k]);
+                    velocities[k] = w * population[j].velocities[k] + c1 * population[j].rand.nextDouble() * (population[j].bestWeights[k]- weights[k]) + c2 * population[j].rand.nextDouble() * (bestNN.weights[k]  - weights[k]);
                     //System.out.println("velocities = " + k + "  " + velocities[k] + " weights" + k + "  " + weights[k]);
                 }
+                population[j].velocities = velocities;
 
                 //update the weights of the NN
                 for (int k = 0; k < weights.length; k++){
@@ -94,15 +95,17 @@ public class PSOTrainedNN {
 
             if( bestFitness == (boardSize * boardSize) - 1){
                 //perfect NN found, return it
-                System.out.println("Finished training");
-                System.out.println("Best NN average score: " + bestNN.averageScoreAndMoves[0] + " and average moves: " + bestNN.averageScoreAndMoves[1] + " and games won: " + bestNN.averageScoreAndMoves[2]);
+                //System.out.println("Finished training");
+                //System.out.println("Best NN average score: " + bestNN.averageScoreAndMoves[0] + " and average moves: " + bestNN.averageScoreAndMoves[1] + " and games won: " + bestNN.averageScoreAndMoves[2]);
                 return bestNN;
             }
+            //Write out a percentage complete inline
+            System.out.print("\r" + (int)((double)i / iterations * 100) + "%");
         }
 
         //finished training - we now have the best NN.
-        System.out.println("Finished training");
-        System.out.println("Best NN average score: " + bestNN.averageScoreAndMoves[0] + " and average moves: " + bestNN.averageScoreAndMoves[1] + " and games won: " + bestNN.averageScoreAndMoves[2]);
+        //System.out.println("Finished training");
+        //System.out.println("Best NN average score: " + bestNN.averageScoreAndMoves[0] + " and average moves: " + bestNN.averageScoreAndMoves[1] + " and games won: " + bestNN.averageScoreAndMoves[2]);
         return bestNN;
     }
     

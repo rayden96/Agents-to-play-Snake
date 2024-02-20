@@ -1,12 +1,12 @@
 import java.util.Random;
 
-public class NodeInitial {
+public class NodeSecond {
     Boolean isTerminal;
 
     char value;
 
-    NodeInitial leftChild;
-    NodeInitial rightChild;
+    NodeSecond leftChild;
+    NodeSecond rightChild;
 
     Random rand;
 
@@ -21,7 +21,10 @@ public class NodeInitial {
     // - ifDanger1Right - if danger is in cell 4 - 'F'
     // - ifDanger1Down - if danger is in cell 6 - 'G'
     // - ifDanger1Left - if danger is in cell 8- 'H'
-    char[] functionSet = {'A' , 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+
+    // - I ifNextMoveEndsGame - if the first operator ends the game, use the second option
+    // - J ifNextMoveLocksIn - if the next move puts the snake in a position whereby he is locked in, do the second 		operand
+    char[] functionSet = {'A' , 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'};
 
     //terminal set:
     // - moveUp - move up - 'U'
@@ -30,7 +33,7 @@ public class NodeInitial {
     // - moveLeft - move left - 'L'
     char[] terminalSet = {'U', 'R', 'D', 'L'};
 
-    public NodeInitial(Boolean isTerminal, Random rand) {
+    public NodeSecond(Boolean isTerminal, Random rand) {
         this.isTerminal = isTerminal;
         leftChild = null;
         rightChild = null;
@@ -40,20 +43,18 @@ public class NodeInitial {
             value = terminalSet[rand.nextInt(4)];
         }
         else {
-            value = functionSet[rand.nextInt(8)];
+            value = functionSet[rand.nextInt(13)];
         }
     }
 
-    public NodeInitial copyNode() {
+    public NodeSecond copyNode() {
         if(isTerminal) {
-            Random rand2 = new Random(this.rand.nextInt());
-            NodeInitial newNode = new NodeInitial(isTerminal, rand2);
+            NodeSecond newNode = new NodeSecond(isTerminal, rand);
             newNode.value = value;
             return newNode;
         }
         else {
-            Random rand2 = new Random(this.rand.nextInt());
-            NodeInitial newNode = new NodeInitial(isTerminal, rand2);
+            NodeSecond newNode = new NodeSecond(isTerminal, rand);
             newNode.value = value;
             newNode.leftChild = leftChild.copyNode();
             newNode.rightChild = rightChild.copyNode();
@@ -70,14 +71,14 @@ public class NodeInitial {
             }
             else{
                 //small chance to change the node to a terminal, else randomly change the value
-                if(rand.nextInt(100) < 30 && depth != 0 && depth != 1 && depth != 2){
+                if(rand.nextInt(100) < 30){
                     isTerminal = true;
                     value = terminalSet[rand.nextInt(4)];
                     leftChild = null;
                     rightChild = null;
                 }
                 else{
-                    value = functionSet[rand.nextInt(8)];
+                    value = functionSet[rand.nextInt(13)];
                 }
             }
         }
@@ -94,7 +95,7 @@ public class NodeInitial {
         
     }
 
-    public Boolean crossover(NodeInitial node, int chance){
+    public Boolean crossover(NodeSecond node, int chance){
         if (rand.nextInt(100) < chance){
             //replace this node with the other node
             value = node.value;
@@ -119,42 +120,57 @@ public class NodeInitial {
     public String printTree(){
         if(isTerminal){
             if(value == 'U'){
-                return "U";
+                return "moveUp";
             }
             else if(value == 'R'){
-                return "R";
+                return "moveRight";
             }
             else if(value == 'D'){
-                return "D";
+                return "moveDown";
             }
             else{
-                return "L";
+                return "moveLeft";
             }
         }
         else{
             if(value == 'A'){
-                return "FU(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifFoodUp(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'B'){
-                return "FR(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifFoodRight(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'C'){
-                return "FD(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifFoodDown(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'D'){
-                return "FL(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifFoodLeft(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'E'){
-                return "D1U(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifDanger1Up(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'F'){
-                return "D1R(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifDanger1Right(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'G'){
-                return "D1D(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifDanger1Down(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else if(value == 'H'){
-                return "D1L(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+                return "ifDanger1Left(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'I'){
+                return "ifNextMoveEndsGame(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'J'){
+                return "ifFoodAnyLeft(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'K'){
+                return "ifFoodAnyRight(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'L'){
+                return "ifFoodAnyUp(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
+            }
+            else if(value == 'M'){
+                return "ifFoodAnyDown(" + leftChild.printTree() + ", " + rightChild.printTree() + ")";
             }
             else throw new IllegalArgumentException("Invalid node value");
         }

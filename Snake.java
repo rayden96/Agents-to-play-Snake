@@ -10,7 +10,8 @@ public class Snake {
     Random rand;
     int numMoves;
 
-    public Snake(int boardSize, Random rand) {
+    public Snake(int boardSize, Random rando) {
+        this.rand = rando;
         this.boardSize = boardSize;
         board = new char[boardSize][boardSize];
         snakeLength = 1;
@@ -20,7 +21,6 @@ public class Snake {
         snakeY = new int[boardSize * boardSize];
         snakeX[0] = snakeHeadX;
         snakeY[0] = snakeHeadY;
-        this.rand = rand;
         
         //place food in a position that is not occupied by the snake
         do {
@@ -32,7 +32,7 @@ public class Snake {
 
         //initialize board
         for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < board.length; j++) {
+            for (int j = 0; j < boardSize; j++) {
                 board[i][j] = ' ';
             }
         }
@@ -50,7 +50,6 @@ public class Snake {
         if (numMoves == 1000) {
             return 'X';
         }
-
 
         switch (direction) {
             case 'U':
@@ -71,6 +70,7 @@ public class Snake {
 
         //check if snake is out of bounds - game loss
         if (snakeHeadX < 0 || snakeHeadX >= boardSize || snakeHeadY < 0 || snakeHeadY >= boardSize) {
+            
             return 'X';
         }
 
@@ -147,7 +147,7 @@ public class Snake {
             return -0.5;
         }
         else{
-            return -1;
+            throw new IllegalArgumentException("Invalid board value");
         }
     }
 
@@ -177,49 +177,25 @@ public class Snake {
         ret[7] = getfeatureValue(snakeHeadX, snakeHeadY - 1);
 
         //feature 9 returns 1 if a food is in a cell to the left of the snake head, 0 if a food is in the same column as the snake head and -1 if a food is in a cell to the right of the snake head
-        for( int i = 0; i < snakeHeadX; i++){
-            for( int j = 0; j < boardSize; j++){
-                if(board[i][j] == 'F'){
-                    ret[8] = 1;
-                }
-            }
+        if(foodX < snakeHeadX){
+            ret[8] = 1;
         }
-
-        for( int i = snakeHeadX; i < boardSize; i++){
-            for( int j = 0; j < boardSize; j++){
-                if(board[i][j] == 'F'){
-                    ret[8] = -1;
-                }
-            }
+        else if(foodX == snakeHeadX){
+            ret[8] = 0;
         }
-
-        for( int j = 0; j < boardSize; j++){
-            if(board[snakeHeadX][j] == 'F'){
-                ret[8] = 0;
-            }
+        else{
+            ret[8] = -1;
         }
 
         //feature 10 returns 1 if a food is in a cell above the snake head, 0 if a food is in the same row as the snake head and -1 if a food is in a cell below the snake head
-        for( int i = 0; i < snakeHeadY; i++){
-            for( int j = 0; j < boardSize; j++){
-                if(board[j][i] == 'F'){
-                    ret[9] = 1;
-                }
-            }
+        if(foodY < snakeHeadY){
+            ret[9] = 1;
         }
-
-        for( int i = snakeHeadY; i < boardSize; i++){
-            for( int j = 0; j < boardSize; j++){
-                if(board[j][i] == 'F'){
-                    ret[9] = -1;
-                }
-            }
+        else if(foodY == snakeHeadY){
+            ret[9] = 0;
         }
-
-        for( int j = 0; j < boardSize; j++){
-            if(board[j][snakeHeadY] == 'F'){
-                ret[9] = 0;
-            }
+        else{
+            ret[9] = -1;
         }
         return ret;
     }
@@ -286,9 +262,5 @@ public class Snake {
 
     }
     
-    //get the euclidean distance from head to food
-    public double getDistance(){
-        return Math.sqrt(Math.pow(snakeHeadX - foodX, 2) + Math.pow(snakeHeadY - foodY, 2));
-    }
 
 }

@@ -3,7 +3,7 @@
 //seems o be performing quite well, only problem is that it has no sense of the future. It will move into 
 //a sure death position to get food - very greedy.
 
-
+//still not reproduceble
 
 import java.util.Random;
 
@@ -31,73 +31,59 @@ public class GPInitial {
 
     int boardSize;
 
-    public GPInitial(int MaxDepth, Random rand, int boardSize) {
+    int initialGenChance;
+
+    int id;
+
+    public GPInitial(int MaxDepth, Random rand, int boardSize, int initialGenChance) {
         this.MaxDepth = MaxDepth;
         this.rand = rand;
         root = null;
         this.boardSize = boardSize;
         fitness = 0;
+        this.initialGenChance = initialGenChance;
 
-        root = initialGeneration(15, 0);
+        root = initialGeneration(this.initialGenChance, 0);
+        id = rand.nextInt();
     }
 
     //use grow method to grow trees
     public NodeInitial initialGeneration(int chance, int depth){
         boolean isTerminal = false;
+        Random randToUse = new Random(rand.nextInt());
         //set isTerminal to true if depth is equal to max depth or if a random number is less than chance percent
-        if((depth == MaxDepth || rand.nextInt(100) < chance) && (depth != 0 && depth != 1)) {
+        if((depth == MaxDepth || rand.nextInt(100) < chance) && (depth != 0 && depth != 1 )) {
             isTerminal = true;
         }
 
         if(isTerminal){
-            NodeInitial newNode = new NodeInitial(isTerminal, rand);
+            NodeInitial newNode = new NodeInitial(isTerminal, randToUse);
             return newNode;
         }
         else{
-            NodeInitial newNode = new NodeInitial(isTerminal, rand);
+            NodeInitial newNode = new NodeInitial(isTerminal, randToUse);
             newNode.leftChild = initialGeneration(chance, depth + 1);
             newNode.rightChild = initialGeneration(chance, depth + 1);
             return newNode;
         }
     }
 
-    public double playAndGetFitness(int numGames, Random newRand){
+    public double playAndGetFitness(int numGames, int sampleSeed){
         fitness = 0;
         for(int i = 0; i < numGames; i++){
-            Snake snake = new Snake(boardSize, newRand);
+            Random rand1 = new Random(i*sampleSeed);
+            Snake snake = new Snake(boardSize, rand1);
             double[] featureVector = new double[10];
             char move;
             char status = 'C';
+           // snake.printBoard();
             while(status != 'W' && status != 'X'){
                 featureVector = snake.getFeatureInput();
                 move = decideMove(featureVector, root);
                 status = snake.move(move);
+                //snake.printBoard();
             }
-            fitness += (boardSize * boardSize -1) - snake.score;
-            if(snake.score == 0)fitness += snake.getDistance();
-            //add a value to the fitness based on the numMoves [0, 1]
-            fitness += (double)snake.numMoves / 1000;
-        }
-        fitness = fitness / numGames;
-        return fitness;
-    }
-
-    //for testing
-    public double playAndGetFitness2(int numGames){
-        fitness = 0;
-        for(int i = 0; i < numGames; i++){
-            Snake snake = new Snake(boardSize, rand);
-            double[] featureVector = new double[10];
-            char move;
-            char status = 'C';
-            snake.printBoard();
-            while(status != 'W' && status != 'X'){
-                featureVector = snake.getFeatureInput();
-                move = decideMove(featureVector, root);
-                status = snake.move(move);
-                snake.printBoard();
-            }
-            fitness += (boardSize * boardSize -1) - snake.score;
+            fitness += ((boardSize * boardSize) -1) - snake.score;
         }
         fitness = fitness / numGames;
         return fitness;
@@ -190,9 +176,11 @@ public class GPInitial {
 
     //copy the tree
     public GPInitial copyTree(){
-        GPInitial newTree = new GPInitial(MaxDepth, rand, boardSize);
-        newTree.root = root.copyNode();
+        Random newRand = new Random(rand.nextInt());
+        GPInitial newTree = new GPInitial(MaxDepth, newRand, boardSize, this.initialGenChance);
+        newTree.root = this.root.copyNode();
         newTree.fitness = fitness;
+        newTree.id = id;
         return newTree;
     }
 
@@ -203,7 +191,8 @@ public class GPInitial {
 
     //crossover the tree
     public GPInitial crossoverTree(GPInitial tree2, int chance){
-        GPInitial newTree = new GPInitial(MaxDepth, rand, boardSize);
+        Random rand2 = new Random(this.rand.nextInt());
+        GPInitial newTree = new GPInitial(MaxDepth, rand2, boardSize, this.initialGenChance);
         newTree.root = root.copyNode();
         newTree.root.crossover(tree2.root, chance);
         return newTree;
@@ -215,7 +204,8 @@ public class GPInitial {
         statistics[1] = 0;
         statistics[2] = 0;
         for(int i = 0; i < numGames; i++){
-            Snake snake = new Snake(boardSize, rand);
+            Random rand1 = new Random(rand.nextInt());
+            Snake snake = new Snake(boardSize, rand1);
             double[] featureVector = new double[10];
             char move;
             char status = 'C';

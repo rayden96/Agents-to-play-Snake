@@ -17,10 +17,11 @@ public class NN {
     public double[] hiddenLayer = new double[hiddenLayerSize + 1];
     public double[] outputLayer = new double[outputLayerSize];
 
-    Snake snake;
+    public double[] velocities = new double[hiddenLayerSize * (inputLayerSize + 1) + outputLayerSize * (hiddenLayerSize + 1)];
+
     int boardSize;
 
-    double[] averageScoreAndMoves = new double[3];
+    double[] averageScoreAndMoves;
 
     Random rand;
 
@@ -34,21 +35,24 @@ public class NN {
         this.weights = weights;
         this.boardSize = boardSize;
         this.rand = rand;
+        for(int i = 0; i < velocities.length; i++){
+            velocities[i] = 0;
+        }
     }
 
     //full deep copy of an NN
     public NN(NN nn){
+        this.rand = nn.rand;
         this.weights = nn.cloneWeights();
         this.boardSize = nn.boardSize;
-        this.rand = nn.rand;
         this.averageScoreAndMoves = new double[3];
 
-        averageScoreAndMoves[0] = nn.averageScoreAndMoves[0];
-        averageScoreAndMoves[1] = nn.averageScoreAndMoves[1];
-        averageScoreAndMoves[2] = nn.averageScoreAndMoves[2];
+        this.averageScoreAndMoves[0] = nn.averageScoreAndMoves[0];
+        this.averageScoreAndMoves[1] = nn.averageScoreAndMoves[1];
+        this.averageScoreAndMoves[2] = nn.averageScoreAndMoves[2];
     }
 
-    public void initializeNN(){
+    public void initializeNN(Snake snake){
 
         //set the input layer
         double[] input = snake.getFeatureInput();
@@ -97,80 +101,91 @@ public class NN {
     }
 
     public double getFitness(){
+        numGames = 100;
+        this.averageScoreAndMoves = new double[3];
         //pay 100 games and return the mean score over those games.
-        averageScoreAndMoves[0] = 0;
-        averageScoreAndMoves[1] = 0;
-        averageScoreAndMoves[2] = 0;
+        this.averageScoreAndMoves[0] = 0;
+        this.averageScoreAndMoves[1] = 0;
+        this.averageScoreAndMoves[2] = 0;
             
         for (int i = 0; i < numGames; i++){
-
-            snake = new Snake(boardSize, rand);
+            Snake snake1 = new Snake(boardSize, rand);
             
-            initializeNN();
+            initializeNN(snake1);
             char direction = getDirection();
-            char state = snake.move(direction);
+            char state = snake1.move(direction);
             //play the game
             while (state != 'X' && state != 'W'){
                 //snake.printBoard();
-                initializeNN();
+                initializeNN(snake1);
                 direction = getDirection();
                 
-                state = snake.move(direction);
+                state = snake1.move(direction);
             }
-            averageScoreAndMoves[0] += snake.score;
-            averageScoreAndMoves[1] += snake.numMoves;
-            if (snake.score == snake.boardSize * snake.boardSize - 1){
-                averageScoreAndMoves[2]++;
+            this.averageScoreAndMoves[0] += snake1.score;
+            this.averageScoreAndMoves[1] += snake1.numMoves;
+            if (snake1.score == snake1.boardSize * snake1.boardSize - 1){
+                this.averageScoreAndMoves[2]++;
             }
         }
-        averageScoreAndMoves[0] /= numGames;
-        averageScoreAndMoves[1] /= numGames;
+        this.averageScoreAndMoves[0] /= numGames;
+        this.averageScoreAndMoves[1] /= numGames;
 
-        if(averageScoreAndMoves[0] > bestFitness){
-            bestFitness = averageScoreAndMoves[0];
+
+        //update the best fitness
+        if(this.averageScoreAndMoves[0] > bestFitness){
+            bestFitness = this.averageScoreAndMoves[0];
             bestWeights = cloneWeights();
         }
-
         return averageScoreAndMoves[0];
     }
 
-    public double getFitness2(){
+    public double[] getFitness2(Random randToUse){
         //pay 100 games and return the mean score over those games.
-        
-        averageScoreAndMoves[0] = 0;
-        averageScoreAndMoves[1] = 0;
-        averageScoreAndMoves[2] = 0;
 
-        for (int i = 0; i < 1; i++){
-            snake = new Snake(boardSize, rand);
+        this.averageScoreAndMoves = new double[3];
+        
+        this.averageScoreAndMoves[0] = 0;
+        this.averageScoreAndMoves[1] = 0;
+        this.averageScoreAndMoves[2] = 0;
+
+        for (int i = 0; i < 100; i++){
+            Snake snake1 = new Snake(boardSize, randToUse);
             
-            initializeNN();
+            initializeNN(snake1);
             char direction = getDirection();
-            snake.printBoard();
-            char state = snake.move(direction);
+            //snake1.printBoard();
+            char state = snake1.move(direction);
             //play the game
             while (state != 'X' && state != 'W'){
-                initializeNN();
+                //wait 1 second
+                // try {
+                //     Thread.sleep(1000);
+                // } catch (InterruptedException e) {
+                //     e.printStackTrace();
+                // }
+                initializeNN(snake1);
                 direction = getDirection();
-                snake.printBoard();
-                state = snake.move(direction);
+               //snake1.printBoard();
+                state = snake1.move(direction);
+                //System.out.println("snake moved " + direction + " and the state is " + state);
             }
-              // System.out.println("Game Over");
-            averageScoreAndMoves[0] += snake.score;
-            averageScoreAndMoves[1] += snake.numMoves;
-            if (snake.score == snake.boardSize * snake.boardSize - 1){
-                averageScoreAndMoves[2]++;
+            // System.out.println();
+            // System.out.println();
+            // snake1.printBoard();
+            // System.out.println();
+            // System.out.println("Game Over");
+
+            this.averageScoreAndMoves[0] += snake1.score;
+            this.averageScoreAndMoves[1] += snake1.numMoves;
+            if (snake1.score == snake1.boardSize * snake1.boardSize - 1){
+                this.averageScoreAndMoves[2]++;
             }
         }//potentially parallelize this
-        averageScoreAndMoves[0] /= 1;
-        averageScoreAndMoves[1] /= 1;
+        this.averageScoreAndMoves[0] /= 100;
+        this.averageScoreAndMoves[1] /= 100;
 
-        if(averageScoreAndMoves[0] > bestFitness){
-            bestFitness = averageScoreAndMoves[0];
-            bestWeights = cloneWeights();
-        }
-
-        return averageScoreAndMoves[0];
+        return this.averageScoreAndMoves;
     }
 
     public double[] returnOutput(){

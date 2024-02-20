@@ -5,6 +5,7 @@ public class Randomizer {
     int boardSize;
     Random rand;
 
+    //stores all moves, scores and games won for each game
     double[] averageScoreAndMoves = new double[3];
 
     //random hand written agent
@@ -14,6 +15,7 @@ public class Randomizer {
     }
 
     double[] run(int numGames){
+        //stores all scores and moves for each game
         averageScoreAndMoves = new double[3];
         averageScoreAndMoves[0] = 0;
         averageScoreAndMoves[1] = 0;
@@ -41,10 +43,10 @@ public class Randomizer {
             averageScoreAndMoves[0] += snake.score;
             averageScoreAndMoves[1] += snake.numMoves;
             if (flag == 'W'){
-                averageScoreAndMoves[2]++;
+                averageScoreAndMoves[2] += 1;
             }
+
         }
-        
         averageScoreAndMoves[0] /= numGames;
         averageScoreAndMoves[1] /= numGames;
 

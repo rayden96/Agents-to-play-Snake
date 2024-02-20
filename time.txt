@@ -1,0 +1,88 @@
+Randomizer: boardsize: 3: 0.56
+Randomizer: boardsize: 4: 0.72
+Randomizer: boardsize: 5: 0.98
+Randomizer: boardsize: 6: 1.78
+Randomizer: boardsize: 7: 1.9
+Randomizer: boardsize: 8: 3.18
+Randomizer: boardsize: 9: 2.86
+Randomizer: boardsize: 40: 2.42
+Towards less dense: boardsize: 3: 0.54
+Towards less dense: boardsize: 4: 0.98
+Towards less dense: boardsize: 5: 1.56
+Towards less dense: boardsize: 6: 1.58
+Towards less dense: boardsize: 7: 2.0
+Towards less dense: boardsize: 8: 2.24
+Towards less dense: boardsize: 9: 1.84
+Towards less dense: boardsize: 40: 9.06
+Wall hugger: boardsize: 3: 0.54
+Wall hugger: boardsize: 4: 1.26
+Wall hugger: boardsize: 5: 1.4
+Wall hugger: boardsize: 6: 1.54
+Wall hugger: boardsize: 7: 2.1
+Wall hugger: boardsize: 8: 2.88
+Wall hugger: boardsize: 9: 2.84
+Wall hugger: boardsize: 40: 8.82
+PSO training: boardsize: 3: 20191.0
+PSO testing: boardsize: 3: 2.88
+PSO training: boardsize: 4: 255486.0
+PSO testing: boardsize: 4: 7.02
+PSO training: boardsize: 5: 324999.0
+PSO testing: boardsize: 5: 17.72
+PSO training: boardsize: 6: 259138.0
+PSO testing: boardsize: 6: 17.82
+PSO training: boardsize: 7: 497333.0
+PSO testing: boardsize: 7: 36.3
+PSO training: boardsize: 8: 482777.0
+PSO testing: boardsize: 8: 41.08
+PSO training: boardsize: 9: 606863.0
+PSO testing: boardsize: 9: 53.36
+PSO training: boardsize: 40: 976078.0
+PSO testing: boardsize: 40: 97.42
+GP training: boardsize: 3: 35204.0
+GP testing: boardsize: 3: 0.88
+GP training: boardsize: 4: 26006.0
+GP testing: boardsize: 4: 0.64
+GP training: boardsize: 5: 27827.0
+GP testing: boardsize: 5: 0.94
+GP training: boardsize: 6: 59597.0
+GP testing: boardsize: 6: 3.04
+GP training: boardsize: 7: 29405.0
+GP testing: boardsize: 7: 0.76
+GP training: boardsize: 8: 101841.0
+GP testing: boardsize: 8: 4.16
+GP training: boardsize: 9: 32938.0
+GP testing: boardsize: 9: 0.86
+GP training: boardsize: 40: 152239.0
+GP testing: boardsize: 40: 6.14
+GP training: boardsize: 3: 149246.0
+GP testing: boardsize: 3: 0.0
+GP training: boardsize: 3: 52558.0
+GP testing: boardsize: 3: 0.32
+GP training: boardsize: 4: 288055.0
+GP testing: boardsize: 4: 0.0
+GP training: boardsize: 4: 105124.0
+GP testing: boardsize: 4: 0.98
+GP training: boardsize: 5: 458704.0
+GP testing: boardsize: 5: 0.0
+GP training: boardsize: 5: 178313.0
+GP testing: boardsize: 5: 2.22
+GP training: boardsize: 6: 681603.0
+GP testing: boardsize: 6: 0.0
+GP training: boardsize: 6: 277084.0
+GP testing: boardsize: 6: 3.06
+GP training: boardsize: 7: 833650.0
+GP testing: boardsize: 7: 0.0
+GP training: boardsize: 7: 321408.0
+GP testing: boardsize: 7: 3.86
+GP training: boardsize: 8: 1225303.0
+GP testing: boardsize: 8: 0.0
+GP training: boardsize: 8: 531018.0
+GP testing: boardsize: 8: 5.74
+GP training: boardsize: 9: 1562318.0
+GP testing: boardsize: 9: 0.0
+GP training: boardsize: 9: 619042.0
+GP testing: boardsize: 9: 7.54
+GP training: boardsize: 40: 2632074.0
+GP testing: boardsize: 40: 0.0
+GP training: boardsize: 40: 1087299.0
+GP testing: boardsize: 40: 12.84

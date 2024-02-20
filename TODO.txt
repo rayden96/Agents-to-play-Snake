@@ -1,0 +1,14 @@
+1. Set up the solver such that it is ready to run with all neceserry text outputs. Dont make it display more than necessary. - done
+
+2. Implement the base statistical analysis of the results. - done
+
+3. play with the parameters, consider adding more options for the GP and better genetic operators.
+
+4. Run the results. 
+
+5. write the paper.
+
+
+Final Updates:
+
+PSO - running optimally - potentially increase population size and initial generation range and maybe more exploration or exploitation?
