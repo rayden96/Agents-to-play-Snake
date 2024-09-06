@@ -1,4 +1,4 @@
-# HonorsProject
+# Training models to play Snake
 4 AI Snake playing agents will be developed and compared against one another.
 
 \1. Ensure GP has reproduceable results
